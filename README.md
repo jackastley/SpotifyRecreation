@@ -13,7 +13,7 @@
 - Compile Main.java
 
 ### Run
-- Run java Spotify in command line
+- Run ```java Spotify``` in command line
 - Login with username seeded in database
 - Use any password
 - Use commands indicated in the command line
