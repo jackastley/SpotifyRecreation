@@ -1,5 +1,5 @@
 # Spotify console application
-## A CRUD Java command line application which emulates the way Spotify clients manage their music library
+## A CRUD Java command line application which emulates the way clients in Spotify send and recieve data
 
 ### Dependencies
 - Ensure MySQL JDBC driver is added to classpath
