@@ -89,9 +89,4 @@ public class SongSearch extends DatabaseConnection {
         return queryBuilder.selectFromWhere(select, from, where, condition);
     }
 
-    public static void main(String[] args) {
-        SongSearch ml = new SongSearch();
-
-        System.out.println(ml.getSongData("Banger", "Jack").album);
-    }
 }

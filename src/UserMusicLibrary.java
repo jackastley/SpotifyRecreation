@@ -160,19 +160,4 @@ public class UserMusicLibrary extends DatabaseConnection {
             System.out.println(e);
         }
     }
-
-    public static void main(String[] args) {
-        UserValidator uv = new UserValidator();
-        UserData ud = uv.getUserData("jackastley", "x");
-        UserMusicLibrary um = new UserMusicLibrary(ud);
-        UserPlaylistData playlistData = um.getUserPlaylistData();
-        SongSearch songSearch = new SongSearch();
-        SongData songData = songSearch.getSongData(2);
-
-        SongData[] allSongs = um.getSongsInPlaylist(playlistData);
-
-        for (SongData song : allSongs) {
-            System.out.println(song.title);
-        }
-    }
 }

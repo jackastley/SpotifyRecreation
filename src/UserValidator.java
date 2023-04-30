@@ -7,7 +7,6 @@ public class UserValidator extends DatabaseConnection {
     public UserData getUserData(String username, String password) throws IllegalArgumentException {
         conn = openConnection();
         if (userExists(username) && passwordIsValid(password)) {
-//            conn = openConnection();
             ResultSet userResultSet = getUserResultSet(username);
             UserData userData = extractUserData(userResultSet);
             closeConnection(conn);
@@ -19,7 +18,6 @@ public class UserValidator extends DatabaseConnection {
     }
 
     public boolean userExists(String username) {
-//        conn = openConnection();
         ResultSet userResultSet = getUserResultSet(username);
         try {
             if (userResultSet.next()) {
@@ -28,9 +26,6 @@ public class UserValidator extends DatabaseConnection {
         } catch (SQLException e) {
             System.out.println(e);
         }
-//        finally {
-//            closeConnection(conn);
-//        }
         return false;
     }
 
@@ -77,9 +72,4 @@ public class UserValidator extends DatabaseConnection {
         return true;
     }
 
-    public static void main(String[] args) {
-        UserValidator uv = new UserValidator();
-        UserData x = uv.getUserData("jackastley", "x");
-        System.out.println(x.lastName);
-    }
 }
