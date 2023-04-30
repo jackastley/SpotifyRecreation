@@ -1,4 +1,4 @@
-# Spotify backend application
+# Spotify console application
 ## A CRUD Java command line application which emulates the way Spotify clients manage thier music library
 
 ### Set-up
