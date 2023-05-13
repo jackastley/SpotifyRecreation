@@ -7,22 +7,7 @@ public class UserInterface {
     private boolean isLoggedIn;
 
     public UserInterface() {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            while (!isLoggedIn) {
-                System.out.print("Enter your username: ");
-                String username = scanner.nextLine();
-
-                System.out.print("Enter your password: ");
-                String password = scanner.nextLine();
-
-                login(username, password);
-                System.out.println();
-            }
-            userMusicLibrary = new UserMusicLibrary(userData);
-            songSearcher = new SongSearch();
-            userCommands();
-        }
+        processUserCommandsLoop();
     }
 
     public void login(String username, String password) {
@@ -44,7 +29,26 @@ public class UserInterface {
         isLoggedIn = false;
     }
 
-    public void userCommands() {
+    private void processUserCommandsLoop(){
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            while (!isLoggedIn) {
+                System.out.print("Enter your username: ");
+                String username = scanner.nextLine();
+
+                System.out.print("Enter your password: ");
+                String password = scanner.nextLine();
+
+                login(username, password);
+                System.out.println();
+            }
+            userMusicLibrary = new UserMusicLibrary(userData);
+            songSearcher = new SongSearch();
+            userCommands();
+        }
+    }
+
+    private void userCommands() {
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         System.out.println("Enter one of the following commands:");

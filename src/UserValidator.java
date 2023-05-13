@@ -1,11 +1,19 @@
 import java.sql.*;
 
-public class UserValidator extends DatabaseConnection {
+public class UserValidator extends DatabaseConnectionFactory {
 
-    Connection conn;
+    private Connection conn;
+
+    public UserValidator(){
+        try{
+            conn = DatabaseConnectionFactory.openConnection();
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
+    }
 
     public UserData getUserData(String username, String password) throws IllegalArgumentException {
-        conn = openConnection();
         if (userExists(username) && passwordIsValid(password)) {
             ResultSet userResultSet = getUserResultSet(username);
             UserData userData = extractUserData(userResultSet);
@@ -51,12 +59,11 @@ public class UserValidator extends DatabaseConnection {
 
     private ResultSet getUserResultSet(String username) {
         try {
-            DatabaseQueryBuilder queryBuilder = new DatabaseQueryBuilder();
             String[] select = {"*"};
             String from = "Users";
             String[] where = {"UserName"};
             String[] condition = {username};
-            String query = queryBuilder.selectFromWhere(select, from, where, condition);
+            String query = DatabaseQueryGenerator.selectFromWhere(select, from, where, condition);
 
             Statement statement = conn.createStatement();
             return statement.executeQuery(query);

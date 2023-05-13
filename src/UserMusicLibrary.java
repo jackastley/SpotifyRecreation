@@ -3,16 +3,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
-import java.util.Queue;
 
-public class UserMusicLibrary extends DatabaseConnection {
+public class UserMusicLibrary extends DatabaseConnectionFactory {
     private UserData userData;
     private Connection conn;
-    private DatabaseQueryBuilder queryBuilder;
 
     public UserMusicLibrary(UserData userData) {
         this.userData = userData;
-        this.queryBuilder = new DatabaseQueryBuilder();
+        try{
+            conn = DatabaseConnectionFactory.openConnection();
+        }
+        catch(SQLException e){
+            System.out.println(e);
+        }
     }
 
     public void playSong(SongData songData) {
@@ -39,24 +42,20 @@ public class UserMusicLibrary extends DatabaseConnection {
     }
 
     public SongData[] getSongsInPlaylist(UserPlaylistData playlistData) {
-        conn = openConnection();
         ResultSet songsInPlaylistResultSet = getSongsInPlaylistResultSet(playlistData.playlistID);
         SongData[] songData = extractPlaylistSongData(songsInPlaylistResultSet);
-        closeConnection(conn);
         return songData;
     }
 
     public UserPlaylistData getUserPlaylistData() {
-        conn = openConnection();
-        UserPlaylistData userPlaylistData = new UserPlaylistData();
         if (userHasPlaylist()) {
             ResultSet rs = getPlaylistResultSet();
-            extractUserPlaylistData(rs, userPlaylistData);
+            UserPlaylistData userPlaylistData = extractUserPlaylistData(rs);
+            return userPlaylistData;
         } else {
             System.out.println("User does not have playlist.");
         }
-        closeConnection(conn);
-        return userPlaylistData;
+        return null;
     }
 
     private boolean songIsInPlaylist(SongData songData, UserPlaylistData playlistData) {
@@ -66,25 +65,23 @@ public class UserMusicLibrary extends DatabaseConnection {
             String from = "UserPlaylistContent";
             String[] where = {"SongID", "PlaylistID"};
             String[] condition = {Integer.toString(songData.songID), Integer.toString(playlistData.playlistID)};
-            String query = queryBuilder.selectFromWhere(select, from, where, condition);
+            String query = DatabaseQueryGenerator.selectFromWhere(select, from, where, condition);
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
-                closeConnection(conn);
                 return true;
             }
         } catch (Exception e) {
             System.out.println("Error checking if song is in playlist");
             System.out.println(e);
         }
-        closeConnection(conn);
         return false;
     }
 
     private String addSongQuery(int songID, int playlistID) {
         String[] columns = {"SongID", "PlaylistID"};
         String[] values = {Integer.toString(songID), Integer.toString(playlistID)};
-        return queryBuilder.insert("UserPlaylistContent", columns, values);
+        return DatabaseQueryGenerator.insert("UserPlaylistContent", columns, values);
     }
 
     private ResultSet getSongsInPlaylistResultSet(int playlistID) {
@@ -95,7 +92,7 @@ public class UserMusicLibrary extends DatabaseConnection {
             String from = "UserPlaylistContent";
             String[] where = {"PlaylistID"};
             String[] condition = {Integer.toString(playlistID)};
-            String query = queryBuilder.selectFromWhere(select, from, where, condition);
+            String query = DatabaseQueryGenerator.selectFromWhere(select, from, where, condition);
             return statement.executeQuery(query);
         } catch (Exception e) {
             System.out.println(e);
@@ -143,7 +140,7 @@ public class UserMusicLibrary extends DatabaseConnection {
             String from = "UserPlaylists";
             String[] where = {"OwnerID"};
             String[] condition = {Integer.toString(userData.userID)};
-            String query = queryBuilder.selectFromWhere(select, from, where, condition);
+            String query = DatabaseQueryGenerator.selectFromWhere(select, from, where, condition);
             return statement.executeQuery(query);
         } catch (SQLException e) {
             System.out.println(e);
@@ -151,13 +148,15 @@ public class UserMusicLibrary extends DatabaseConnection {
         return null;
     }
 
-    private void extractUserPlaylistData(ResultSet rs, UserPlaylistData userPlaylistData) {
+    private UserPlaylistData extractUserPlaylistData(ResultSet rs) {
         try {
             rs.next();
-            userPlaylistData.playlistID = rs.getInt(rs.findColumn("PlaylistID"));
-            userPlaylistData.playlistTitle = rs.getString(rs.findColumn("PlaylistTitle"));
+            int playlistID = rs.getInt(rs.findColumn("PlaylistID"));
+            String playlistTitle = rs.getString(rs.findColumn("PlaylistTitle"));
+            return new UserPlaylistData(playlistID, playlistTitle);
         } catch (Exception e) {
             System.out.println(e);
+            return null;
         }
     }
 }
